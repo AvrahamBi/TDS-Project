@@ -20,7 +20,10 @@ cat_df["PaperlessBilling"] = cat_df["PaperlessBilling"].map({"Yes":0,"No":1})
 cat_df.head()
 
 # Chi squared test
-x = cat_df.iloc[:,:-1]  #Independent variable
-y = cat_df.iloc[:,-1]   #Target variable
-f_score = chi2(x,y)   #returns f score and p value
+x = cat_df.iloc[:,:-1]  # Independent variable
+y = cat_df.iloc[:,-1]   # Target variable
+f_score = chi2(x,y)   # returns f score and p value
 print(f_score)
+
+
+# TODO: https://medium.com/analytics-vidhya/categorical-feature-selection-using-chi-squared-test-e4c0d0af6b7e
