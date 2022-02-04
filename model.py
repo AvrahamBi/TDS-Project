@@ -1,4 +1,5 @@
 from pandas import read_csv
+from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.model_selection import train_test_split
