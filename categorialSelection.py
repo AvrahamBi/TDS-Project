@@ -3,7 +3,8 @@ import pandas as pd
 import seaborn as sns
 from sklearn.datasets import load_breast_cancer, load_wine, load_iris, load_digits, load_linnerud, load_diabetes
 from sklearn.feature_selection import SelectKBest, SelectPercentile, chi2
-
+from sklearn.ensemble import ExtraTreesClassifier
+import matplotlib.pyplot as plt
 
 def reduce(ds, method="k_best", k=3, p=10):
     dataSet = ds
@@ -24,6 +25,7 @@ def showScore():
     data = pd.read_csv("train.csv")
     X = data.iloc[:,0:20]  #independent columns
     y = data.iloc[:,-1]    #target column i.e price range
+
     #apply SelectKBest class to extract top 10 best features
     bestfeatures = SelectKBest(score_func=chi2, k=10)
     fit = bestfeatures.fit(X,y)
@@ -38,8 +40,7 @@ def showGraph():
     data = pd.read_csv("train.csv")
     X = data.iloc[:, 0:20]  # independent columns
     y = data.iloc[:, -1]  # target column i.e price range
-    from sklearn.ensemble import ExtraTreesClassifier
-    import matplotlib.pyplot as plt
+
     model = ExtraTreesClassifier()
     model.fit(X, y)
     print(model.feature_importances_)  # use inbuilt class feature_importances of tree based classifiers
@@ -63,7 +64,7 @@ def checkGraphs():
 
 checkGraphs()
 
-#irisX, irisY = load_iris(return_X_y=True)
+#X, y = load_iris(return_X_y=True)
 #iris - load_iris()
 # digits = load_digits()
 # diabetes = load_diabetes()
