@@ -33,8 +33,3 @@ cancer = load_breast_cancer()
 ds = [iris, digits, diabetes, wine, cancer]
 for d in ds:
     check(d)
-
-
-
-
-# TODO: https://www.geeksforgeeks.org/ml-chi-square-test-for-feature-selection/

@@ -55,6 +55,3 @@ yhat = model.predict(X_test_enc)
 # evaluate predictions
 accuracy = accuracy_score(y_test_enc, yhat)
 print('Accuracy: %.2f' % (accuracy * 100))
-
-
-# TODO: https://machinelearningmastery.com/feature-selection-with-categorical-data/
