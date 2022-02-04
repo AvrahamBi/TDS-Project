@@ -41,6 +41,7 @@ def prepare_targets(y_train, y_test):
 
 # load the dataset
 X, y = load_dataset('breast-cancer.csv')
+print(X)
 # split into train and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
 # prepare input data
