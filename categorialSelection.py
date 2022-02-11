@@ -18,8 +18,6 @@ def ds_loader(filename, y_index):
     # convert to list
     for i in features_:
         features.append(i)
-    #features = ds.iloc[0]
-    #ds = ds.astype(str)
     ds_x = ds.drop(ds.columns[[y_index]], axis=1)
     ds_y = ds[y_index]
     # encode x
@@ -54,25 +52,32 @@ def sort_scores(selector, features):
         scores.append(sorted_dict[i])
     return features, scores
 
-
-
 def showGraph(selector, features, target_index):
     features, scores = sort_scores(selector, features)
     for i in range(len(features)):
          print(features[i], scores[i])
     # plot the scores
+    compareSizes(scores)
+    #
     pyplot.bar([features[i] for i in range(len(scores))], scores)
     pyplot.show()
-    # plt.plot([1, 2, 3, 4])
-    # plt.ylabel('some numbers')
-    # plt.show()
+    return features, scores
+
+# function find the biggest jump of scores
+def compareSizes(scores):
+    sizeMulti = []
+    for i in range(len(scores)-1):
+        differ = scores[i+1] / scores[i]
+        sizeMulti.append(differ)
+    print("SIZE NULTI:", sizeMulti)
+    print("MAX MULTI:", max(sizeMulti))
+
 
 ############ MAIN #############
 
-
 # X, y, features = ds_loader("video_games_ds.csv", 10) # target columns is: Critic_Score
 # reduced_x , selector = select_features(X, y)
-# showGraph(selector, features, 10)
+# features, scores = showGraph(selector, features, 10)
 
 
 X, y, features = ds_loader("wine_ds.csv", 4) # target columns is: Points
