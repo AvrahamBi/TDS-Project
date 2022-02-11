@@ -11,7 +11,6 @@ from matplotlib import pyplot
 
 def ds_loader(filename, y_index):
     ds = pd.read_csv(filename, header=None, dtype='unicode').astype(str)
-    #ds = ds.astype(str)
     # get pandas DF of features
     features_ = ds.iloc[0].drop(index=y_index)
     features = []
@@ -32,7 +31,7 @@ def ds_loader(filename, y_index):
     return ds_x, ds_y, features
 
 def select_features(x, y):
-    selector = SelectKBest(score_func=chi2, k=3)
+    selector = SelectKBest(score_func=chi2, k=k)
     selector.fit(x, y)
     reduced_x = selector.transform(x)
     return reduced_x, selector
@@ -56,33 +55,48 @@ def showGraph(selector, features, target_index):
     features, scores = sort_scores(selector, features)
     for i in range(len(features)):
          print(features[i], scores[i])
+    # calculate best K
+    getK_line(scores)
+    getK_scores(scores)
     # plot the scores
-    compareSizes(scores)
-    #
     pyplot.bar([features[i] for i in range(len(scores))], scores)
     pyplot.show()
     return features, scores
 
+# function finds how many features have score above thrshold
+def getK_scores(scores, threshold = 10000):
+    indexToSelect = 0
+    for i in range(len(scores)):
+        if (threshold < scores[i]):
+            indexToSelect = i
+            break
+    k = len(scores) - indexToSelect # K is number of features with score above threshold
+    return k
+
+
 # function find the biggest jump of scores
-def compareSizes(scores):
+def getK_line(scores):
     sizeMulti = []
+    indexToSelect = 0
     for i in range(len(scores)-1):
         differ = scores[i+1] / scores[i]
         sizeMulti.append(differ)
-    print("SIZE NULTI:", sizeMulti)
-    print("MAX MULTI:", max(sizeMulti))
-
+    for i in range(len(sizeMulti)):
+        if sizeMulti[i] == max(sizeMulti):
+            indexToSelect = i
+    k = len(scores) - 1 - indexToSelect  # K is the number of best features we want to have in our reduced DS
+    return k
 
 ############ MAIN #############
 
-# X, y, features = ds_loader("video_games_ds.csv", 10) # target columns is: Critic_Score
-# reduced_x , selector = select_features(X, y)
-# features, scores = showGraph(selector, features, 10)
-
-
-X, y, features = ds_loader("wine_ds.csv", 4) # target columns is: Points
+X, y, features = ds_loader("video_games_ds.csv", 10) # target columns is: Critic_Score
 reduced_x , selector = select_features(X, y)
-showGraph(selector, features, 4)
+features, scores = showGraph(selector, features, 10)
+
+
+# X, y, features = ds_loader("wine_ds.csv", 4) # target columns is: Points
+# reduced_x , selector = select_features(X, y)
+# showGraph(selector, features, 4)
 
 
 
