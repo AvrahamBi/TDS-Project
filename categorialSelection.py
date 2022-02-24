@@ -89,7 +89,7 @@ def getK_long_tail(scores):
 
 
 def chooseK(ds, target_column_index):
-    X, y, features = ds_loader(ds, 10)  # target columns is: Critic_Score
+    X, y, features = ds_loader(ds, target_column_index)  # target columns is: Critic_Score
     print("Original number of features:", X.shape[1])
     selector = SelectKBest(score_func=chi2, k='all')
     selector.fit(X, y)
@@ -119,9 +119,9 @@ def chooseK(ds, target_column_index):
 
 THRESHOLD = 10000
 
-chooseK("wine_ds.csv", 4)               # Target column:
-chooseK("income_ds.csv", 3)             #
-chooseK("titanic_ds.csv", 2)            #
-chooseK("video_games_ds.csv", 10)       #
+#chooseK("wine_ds.csv", 4)               # Target column: Points
+chooseK("income_ds.csv", 14)             # Target column: income
+#chooseK("titanic_ds.csv", 1)            # Target column: Survived
+#chooseK("video_games_ds.csv", 9)        # Target column: Global_Sales
 
 
