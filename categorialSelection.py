@@ -30,7 +30,6 @@ def ds_loader(filename, y_index):
     ds_y = le.transform(ds_y)
     return ds_x, ds_y, features
 
-
 def reduce_features(x, y, k):
     selector = SelectKBest(score_func=chi2, k=k)
     reduced_x = selector.fit(x, y).transform(x)
@@ -88,12 +87,11 @@ def getK_long_tail(scores):
     k = len(scores) - 1 - indexToSelect  # K is the number of best features we want to have in our reduced DS
     return k
 
-THRESHOLD = 10000
 
 def chooseK(ds, target_column_index):
-    X, y, features = ds_loader("video_games_ds.csv", 10)  # target columns is: Critic_Score
+    X, y, features = ds_loader(ds, 10)  # target columns is: Critic_Score
     print("Original number of features:", X.shape[1])
-    selector = SelectKBest(score_func=chi2, k=10)
+    selector = SelectKBest(score_func=chi2, k='all')
     selector.fit(X, y)
     features, scores = sort_scores(selector, features)
     showScores(features, scores, "Original features with their scores:")
@@ -119,7 +117,11 @@ def chooseK(ds, target_column_index):
 
 ############ MAIN #############
 
+THRESHOLD = 10000
 
-chooseK("video_games_ds.csv", 10)
-chooseK("wine_ds.csv", 4)
+chooseK("wine_ds.csv", 4)               # Target column:
+chooseK("income_ds.csv", 3)             #
+chooseK("titanic_ds.csv", 2)            #
+chooseK("video_games_ds.csv", 10)       #
+
 
