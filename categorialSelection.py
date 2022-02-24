@@ -71,7 +71,8 @@ def getK_threshold(scores, threshold = 10000):
         if (threshold < scores[i]):
             indexToSelect = i
             break
-    k = len(scores) - indexToSelect # K is number of features with score above threshold
+    # K is number of features with score above threshold
+    k = len(scores) - indexToSelect
     return k
 
 # function find the biggest jump of scores
@@ -84,7 +85,8 @@ def getK_long_tail(scores):
     for i in range(len(sizeMulti)):
         if sizeMulti[i] == max(sizeMulti):
             indexToSelect = i
-    k = len(scores) - 1 - indexToSelect  # K is the number of best features we want to have in our reduced DS
+    # K is the number of best features we want to have in our reduced DS
+    k = len(scores) - 1 - indexToSelect
     return k
 
 
@@ -119,9 +121,9 @@ def chooseK(ds, target_column_index):
 
 THRESHOLD = 10000
 
-#chooseK("wine_ds.csv", 4)               # Target column: Points
+chooseK("wine_ds.csv", 4)               # Target column: Points
 chooseK("income_ds.csv", 14)             # Target column: income
-#chooseK("titanic_ds.csv", 1)            # Target column: Survived
-#chooseK("video_games_ds.csv", 9)        # Target column: Global_Sales
+chooseK("titanic_ds.csv", 1)            # Target column: Survived
+chooseK("video_games_ds.csv", 9)        # Target column: Global_Sales
 
 
