@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import pandas as pd
 import seaborn as sns
 from sklearn.datasets import load_breast_cancer, load_wine, load_iris, load_digits, load_linnerud, load_diabetes
@@ -21,7 +22,6 @@ def ds_loader(filename, y_index):
     ds_y = ds[y_index]
     # encode x
     oe = OrdinalEncoder()
-    # oe = OneHotEncoding() # better but slower
     oe.fit(ds_x)
     ds_x = oe.transform(ds_x)
     # encode y
@@ -30,10 +30,10 @@ def ds_loader(filename, y_index):
     ds_y = le.transform(ds_y)
     return ds_x, ds_y, features
 
-def select_features(x, y):
+
+def reduce_features(x, y, k):
     selector = SelectKBest(score_func=chi2, k=k)
-    selector.fit(x, y)
-    reduced_x = selector.transform(x)
+    reduced_x = selector.fit(x, y).transform(x)
     return reduced_x, selector
 
 def sort_scores(selector, features):
@@ -42,29 +42,31 @@ def sort_scores(selector, features):
         dict[features[i]] = selector.scores_[i]
     sorted_dict = {}
     sorted_keys = sorted(dict, key=dict.get)
-    for w in sorted_keys:
-        sorted_dict[w] = dict[w]
+    for i in sorted_keys:
+        sorted_dict[i] = dict[i]
     features = []
     scores = []
     for i in sorted_dict:
         features.append(i)
         scores.append(sorted_dict[i])
+    for i in range(len(scores)):
+        scores[i] = math.floor(scores[i])
     return features, scores
 
-def showGraph(selector, features, target_index):
-    features, scores = sort_scores(selector, features)
+def showScores(features, scores, msg):
+    print(msg)
     for i in range(len(features)):
-         print(features[i], scores[i])
-    # calculate best K
-    getK_line(scores)
-    getK_scores(scores)
+        print("Feature:", features[i] + ",   Score:", scores[i])
+
+def showGraph(features, scores, msg):
     # plot the scores
     pyplot.bar([features[i] for i in range(len(scores))], scores)
+    pyplot.title(msg)
     pyplot.show()
     return features, scores
 
-# function finds how many features have score above thrshold
-def getK_scores(scores, threshold = 10000):
+# function finds how many features have score above threshold
+def getK_threshold(scores, threshold = 10000):
     indexToSelect = 0
     for i in range(len(scores)):
         if (threshold < scores[i]):
@@ -73,9 +75,8 @@ def getK_scores(scores, threshold = 10000):
     k = len(scores) - indexToSelect # K is number of features with score above threshold
     return k
 
-
 # function find the biggest jump of scores
-def getK_line(scores):
+def getK_long_tail(scores):
     sizeMulti = []
     indexToSelect = 0
     for i in range(len(scores)-1):
@@ -87,65 +88,38 @@ def getK_line(scores):
     k = len(scores) - 1 - indexToSelect  # K is the number of best features we want to have in our reduced DS
     return k
 
+THRESHOLD = 10000
+
+def chooseK(ds, target_column_index):
+    X, y, features = ds_loader("video_games_ds.csv", 10)  # target columns is: Critic_Score
+    print("Original number of features:", X.shape[1])
+    selector = SelectKBest(score_func=chi2, k=10)
+    selector.fit(X, y)
+    features, scores = sort_scores(selector, features)
+    showScores(features, scores, "Original features with their scores:")
+    showGraph(features, scores, "Original features with their scores:")
+    print("")
+    #
+    threshold_k = getK_threshold(scores, threshold=THRESHOLD)
+    long_tail_k = getK_long_tail(scores)
+    k = min(threshold_k, long_tail_k)
+    print("K chosen by long_tail is:", long_tail_k)
+    print("K chosen by threshold (" + str(THRESHOLD) + ") is:", threshold_k)
+    print("The minimal K is:", k)
+    print("")
+    #
+    reduced_x, selector = reduce_features(X, y, k)
+    reduced_features = features[-k:]
+    reduced_scores = scores[-k:]
+    showScores(reduced_features, reduced_scores, "After reduction:")
+    showGraph(reduced_features, reduced_scores, "After reduction:")
+
+
+
+
 ############ MAIN #############
 
-X, y, features = ds_loader("video_games_ds.csv", 10) # target columns is: Critic_Score
-reduced_x , selector = select_features(X, y)
-features, scores = showGraph(selector, features, 10)
 
+chooseK("video_games_ds.csv", 10)
+chooseK("wine_ds.csv", 4)
 
-# X, y, features = ds_loader("wine_ds.csv", 4) # target columns is: Points
-# reduced_x , selector = select_features(X, y)
-# showGraph(selector, features, 4)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
-# def showScore():
-#     data = pd.read_csv("train.csv")
-#     X = data.iloc[:,0:20]  #independent columns
-#     y = data.iloc[:,-1]    #target column i.e price range
-#
-#     #apply SelectKBest class to extract top 10 best features
-#     bestfeatures = SelectKBest(score_func=chi2, k=10)
-#     fit = bestfeatures.fit(X,y)
-#     dfscores = pd.DataFrame(fit.scores_)
-#     dfcolumns = pd.DataFrame(X.columns)
-#     #concat two dataframes for better visualization
-#     featureScores = pd.concat([dfcolumns,dfscores],axis=1)
-#     featureScores.columns = ['Specs','Score']  #naming the dataframe columns
-#     print(featureScores.nlargest(10,'Score'))  #print 10 best features
-#
-# def showGraph():
-#     X_, y_ = load_iris(return_X_y=True)
-#     X = pd.DataFrame(X_)
-#     y = pd.DataFrame(y_)
-#     #data = pd.read_csv("train.csv")
-#     X = data.iloc[:, 0:20]  # independent columns
-#     y = data.iloc[:, -1]  # target column i.e price range
-#     model = ExtraTreesClassifier()
-#     model.fit(X, y)
-#     print(model.feature_importances_)  # use inbuilt class feature_importances of tree based classifiers
-#     # plot graph of feature importances for better visualization
-#     feat_importances = pd.Series(model.feature_importances_, index=X.columns)
-#     feat_importances.nlargest(15).plot(kind='barh')
-#     plt.show()
