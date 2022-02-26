@@ -61,6 +61,7 @@ def showGraph(features, scores, msg):
     # plot the scores
     pyplot.bar([features[i] for i in range(len(scores))], scores)
     pyplot.title(msg)
+    pyplot.xticks(rotation=90)
     pyplot.show()
     return features, scores
 
@@ -91,7 +92,8 @@ def getK_long_tail(scores):
 
 
 def chooseK(ds, target_column_index):
-    X, y, features = ds_loader(ds, target_column_index)  # target columns is: Critic_Score
+    X, y, features = ds_loader(ds, target_column_index)
+    print("")
     print("Original number of features:", X.shape[1])
     selector = SelectKBest(score_func=chi2, k='all')
     selector.fit(X, y)
@@ -105,7 +107,7 @@ def chooseK(ds, target_column_index):
     k = min(threshold_k, long_tail_k)
     print("K chosen by long_tail is:", long_tail_k)
     print("K chosen by threshold (" + str(THRESHOLD) + ") is:", threshold_k)
-    print("The minimal K is:", k)
+    print("Minimal K is:", k)
     print("")
     #
     reduced_x, selector = reduce_features(X, y, k)
@@ -121,9 +123,10 @@ def chooseK(ds, target_column_index):
 
 THRESHOLD = 10000
 
-chooseK("wine_ds.csv", 4)               # Target column: Points
-chooseK("income_ds.csv", 14)            # Target column: income
-chooseK("titanic_ds.csv", 1)            # Target column: Survived
+
+#chooseK("wine_ds.csv", 4)               # Target column: Points
+#chooseK("income_ds.csv", 14)            # Target column: income
+#chooseK("titanic_ds.csv", 4)            # Target column: Survived
 chooseK("video_games_ds.csv", 9)        # Target column: Global_Sales
 
 
