@@ -1,15 +1,12 @@
 import math
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from matplotlib import pyplot
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OrdinalEncoder
 from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
 from sklearn.feature_selection import SelectKBest, SelectPercentile, chi2
 
 ####### CONSTS ######
-
 THRESHOLD = 10000
 
 # load Data set from csv file
@@ -100,6 +97,7 @@ def getK_long_tail(scores):
 
 # the main function that executes the process
 def chooseK(ds, target_column_index):
+    print("Start working on:", ds)
     # load data
     X, y, features = ds_loader(ds, target_column_index)
     # print some info of features and scores before reduction
