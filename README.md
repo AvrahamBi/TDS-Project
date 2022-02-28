@@ -1,2 +1,2 @@
 # TDS-Project
-Final Project in TDS Workshop course 
+Final Project in TDS Workshop course.
