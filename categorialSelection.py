@@ -1,15 +1,18 @@
-import numpy as np
 import math
+import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.datasets import load_breast_cancer, load_wine, load_iris, load_digits, load_linnerud, load_diabetes
-from sklearn.feature_selection import SelectKBest, SelectPercentile, chi2
-from sklearn.ensemble import ExtraTreesClassifier
+from matplotlib import pyplot
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OrdinalEncoder
-from matplotlib import pyplot
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.feature_selection import SelectKBest, SelectPercentile, chi2
 
+####### CONSTS ######
 
+THRESHOLD = 10000
+
+# load Data set from csv file
 def ds_loader(filename, y_index):
     ds = pd.read_csv(filename, header=None, dtype='unicode').astype(str)
     # get pandas DF of features
@@ -30,11 +33,13 @@ def ds_loader(filename, y_index):
     ds_y = le.transform(ds_y)
     return ds_x, ds_y, features
 
+# discard columns and reduce data set
 def reduce_features(x, y, k):
     selector = SelectKBest(score_func=chi2, k=k)
     reduced_x = selector.fit(x, y).transform(x)
     return reduced_x, selector
 
+# sort scores and features list into 2 sorted lists
 def sort_scores(selector, features):
     dict = {}
     for i in range(len(selector.scores_)):
@@ -52,11 +57,13 @@ def sort_scores(selector, features):
         scores[i] = math.floor(scores[i])
     return features, scores
 
+# print to console the features and their scores
 def showScores(features, scores, msg):
     print(msg)
     for i in range(len(features)):
         print("Feature:", features[i] + ",   Score:", scores[i])
 
+# show graoh of features and scores to user
 def showGraph(features, scores, msg):
     # plot the scores
     pyplot.bar([features[i] for i in range(len(scores))], scores)
@@ -76,7 +83,7 @@ def getK_threshold(scores, threshold = 10000):
     k = len(scores) - indexToSelect
     return k
 
-# function find the biggest jump of scores
+# finds an elbow point in features scores
 def getK_long_tail(scores):
     sizeMulti = []
     indexToSelect = 0
@@ -86,13 +93,16 @@ def getK_long_tail(scores):
     for i in range(len(sizeMulti)):
         if sizeMulti[i] == max(sizeMulti):
             indexToSelect = i
-    # K is the number of best features we want to have in our reduced DS
+    # K is number of features above elbow point
     k = len(scores) - 1 - indexToSelect
     return k
 
 
+# the main function that executes the process
 def chooseK(ds, target_column_index):
+    # load data
     X, y, features = ds_loader(ds, target_column_index)
+    # print some info of features and scores before reduction
     print("")
     print("Original number of features:", X.shape[1])
     selector = SelectKBest(score_func=chi2, k='all')
@@ -109,24 +119,22 @@ def chooseK(ds, target_column_index):
     print("K chosen by threshold (" + str(THRESHOLD) + ") is:", threshold_k)
     print("Minimal K is:", k)
     print("")
-    #
+
+    # here we got reduced dataset and reduced features and scores lists
     reduced_x, selector = reduce_features(X, y, k)
     reduced_features = features[-k:]
     reduced_scores = scores[-k:]
+
+    # print some info of features and scores after reduction
     showScores(reduced_features, reduced_scores, "After reduction:")
     showGraph(reduced_features, reduced_scores, "After reduction:")
 
 
-
-
 ############ MAIN #############
 
-THRESHOLD = 10000
-
-
-#chooseK("wine_ds.csv", 4)               # Target column: Points
-#chooseK("income_ds.csv", 14)            # Target column: income
-#chooseK("titanic_ds.csv", 4)            # Target column: Survived
+chooseK("wine_ds.csv", 4)               # Target column: Points
+chooseK("income_ds.csv", 14)            # Target column: income
+chooseK("titanic_ds.csv", 4)            # Target column: Survived
 chooseK("video_games_ds.csv", 9)        # Target column: Global_Sales
 
 
