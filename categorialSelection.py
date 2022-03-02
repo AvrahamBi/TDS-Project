@@ -100,6 +100,7 @@ def chooseK(ds, target_column_index):
     print("Start working on:", ds)
     # load data
     X, y, features = ds_loader(ds, target_column_index)
+    originalFeatures = features.copy()
     # print some info of features and scores before reduction
     print("")
     print("Original number of features:", X.shape[1])
@@ -111,9 +112,9 @@ def chooseK(ds, target_column_index):
     print("")
     #
     threshold_k = getK_threshold(scores, threshold=THRESHOLD)
-    long_tail_k = getK_long_tail(scores)
-    k = min(threshold_k, long_tail_k)
-    print("K chosen by long_tail is:", long_tail_k)
+    elbow_point_k = getK_long_tail(scores)
+    k = min(threshold_k, elbow_point_k)
+    print("K chosen by long_tail is:", elbow_point_k)
     print("K chosen by threshold (" + str(THRESHOLD) + ") is:", threshold_k)
     print("Minimal K is:", k)
     print("")
@@ -127,12 +128,11 @@ def chooseK(ds, target_column_index):
     showScores(reduced_features, reduced_scores, "After reduction:")
     showGraph(reduced_features, reduced_scores, "After reduction:")
 
-
 ############ MAIN #############
 
-chooseK("wine_ds.csv", 4)               # Target column: Points
-chooseK("income_ds.csv", 14)            # Target column: income
-chooseK("titanic_ds.csv", 4)            # Target column: Survived
-chooseK("video_games_ds.csv", 9)        # Target column: Global_Sales
+chooseK("wine_ds.csv", 4)                # Target column: Points
+chooseK("income_ds.csv", 14)             # Target column: income
+chooseK("titanic_ds.csv", 4)             # Target column: Survived
+chooseK("video_games_ds.csv", 9)         # Target column: Global_Sales
 
 
