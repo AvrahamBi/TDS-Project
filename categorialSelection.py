@@ -81,7 +81,7 @@ def getK_threshold(scores, threshold = 10000):
     return k
 
 # finds an elbow point in features scores
-def getK_long_tail(scores):
+def getK_elbow_point(scores):
     sizeMulti = []
     indexToSelect = 0
     for i in range(len(scores)-1):
@@ -112,9 +112,9 @@ def chooseK(ds, target_column_index):
     print("")
     #
     threshold_k = getK_threshold(scores, threshold=THRESHOLD)
-    elbow_point_k = getK_long_tail(scores)
+    elbow_point_k = getK_elbow_point(scores)
     k = min(threshold_k, elbow_point_k)
-    print("K chosen by long_tail is:", elbow_point_k)
+    print("K chosen by elbow_point is:", elbow_point_k)
     print("K chosen by threshold (" + str(THRESHOLD) + ") is:", threshold_k)
     print("Minimal K is:", k)
     print("")
