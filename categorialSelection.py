@@ -20,6 +20,8 @@ def ds_loader(filename, y_index):
         features.append(i)
     ds_x = ds.drop(ds.columns[[y_index]], axis=1)
     ds_y = ds[y_index]
+    original_ds_x = ds_x.copy()
+    original_ds_y = ds_y
     # encode x
     oe = OrdinalEncoder()
     oe.fit(ds_x)
@@ -28,13 +30,20 @@ def ds_loader(filename, y_index):
     le = LabelEncoder()
     le.fit(ds_y)
     ds_y = le.transform(ds_y)
-    return ds_x, ds_y, features
+    # original_ds_x is the data set without encoding
+    return ds_x, ds_y, features, original_ds_x, original_ds_y
 
 # discard columns and reduce data set
-def reduce_features(x, y, k):
-    selector = SelectKBest(score_func=chi2, k=k)
-    reduced_x = selector.fit(x, y).transform(x)
-    return reduced_x, selector
+def reduce_features(features, reduced_features, original_ds_x):
+    # selector = SelectKBest(score_func=chi2, k=k)
+    # reduced_x = selector.fit(x, y).transform(x)
+    # return reduced_x, selector
+    columnsToRemove = []
+    for i in range(len(features)):
+        if features[i] not in reduced_features:
+            columnsToRemove.append(i)
+    original_ds_x.drop(original_ds_x.columns[columnsToRemove], axis=1, inplace=True)
+    return original_ds_x
 
 # sort scores and features list into 2 sorted lists
 def sort_scores(selector, features):
@@ -99,8 +108,7 @@ def getK_elbow_point(scores):
 def chooseK(ds, target_column_index):
     print("Start working on:", ds)
     # load data
-    X, y, features = ds_loader(ds, target_column_index)
-    originalFeatures = features.copy()
+    X, y, features, original_ds_x, original_ds_y = ds_loader(ds, target_column_index)
     # print some info of features and scores before reduction
     print("")
     print("Original number of features:", X.shape[1])
@@ -120,19 +128,20 @@ def chooseK(ds, target_column_index):
     print("")
 
     # here we got reduced dataset and reduced features and scores lists
-    reduced_x, selector = reduce_features(X, y, k)
     reduced_features = features[-k:]
     reduced_scores = scores[-k:]
+    reduced_x = reduce_features(features, reduced_features, original_ds_x)
 
     # print some info of features and scores after reduction
     showScores(reduced_features, reduced_scores, "After reduction:")
     showGraph(reduced_features, reduced_scores, "After reduction:")
+    return reduced_x
 
 ############ MAIN #############
 
-chooseK("wine_ds.csv", 4)                # Target column: Points
-chooseK("income_ds.csv", 14)             # Target column: income
-chooseK("titanic_ds.csv", 4)             # Target column: Survived
-chooseK("video_games_ds.csv", 9)         # Target column: Global_Sales
+reduced_wine = chooseK("wine_ds.csv", 4)                # Target column: Points
+reduced_income = chooseK("income_ds.csv", 14)             # Target column: income
+reduced_titanic = chooseK("titanic_ds.csv", 4)             # Target column: Survived
+reduced_video_games = chooseK("video_games_ds.csv", 9)         # Target column: Global_Sales
 
 
